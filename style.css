@@ -1,0 +1,157 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+body{
+    margin:0;
+    font-family:'Inter', Arial, sans-serif;
+
+    /* רקע נקי ויוקרתי */
+    background: #f6f7fb;
+
+    color:#1f1f1f;
+
+    padding-top:80px;
+}
+
+/* ===== NAVBAR (APPLE / SAAS STYLE) ===== */
+.navbar{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:75px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:0 40px;
+    box-sizing:border-box;
+
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(15px);
+
+    border-bottom:1px solid rgba(124,58,237,0.15);
+
+    box-shadow:0 10px 25px rgba(0,0,0,0.05);
+}
+
+/* LOGO */
+.logo{
+    font-weight:800;
+    font-size:18px;
+    color:#6d28d9;
+    letter-spacing:1px;
+}
+
+/* LINKS */
+.links{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.links a{
+    text-decoration:none;
+    color:#444;
+    font-weight:600;
+
+    padding:8px 12px;
+    border-radius:10px;
+
+    transition:0.25s;
+}
+
+.links a:hover{
+    background:rgba(109,40,217,0.08);
+    color:#6d28d9;
+}
+
+/* USER */
+.hello{
+    color:#6d28d9;
+    font-weight:700;
+}
+
+/* LOGOUT */
+.logout{
+    background:#6d28d9;
+    color:white !important;
+
+    padding:8px 14px;
+    border-radius:10px;
+
+    font-weight:700;
+
+    box-shadow:0 6px 15px rgba(109,40,217,0.2);
+
+    transition:0.3s;
+}
+
+.logout:hover{
+    transform:translateY(-2px);
+}
+
+/* ===== CARD (GLASS CLEAN) ===== */
+.card{
+    background:white;
+
+    border:1px solid rgba(0,0,0,0.06);
+
+    padding:40px;
+    width:380px;
+    margin:auto;
+
+    border-radius:18px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+
+    text-align:center;
+}
+
+/* TEXT */
+h1,h2{
+    color:#6d28d9;
+    font-weight:800;
+}
+
+/* INPUT */
+input,select{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+
+    border-radius:10px;
+    border:1px solid #ddd;
+
+    background:white;
+}
+
+input:focus,select:focus{
+    outline:none;
+    border-color:#6d28d9;
+    box-shadow:0 0 0 3px rgba(109,40,217,0.15);
+}
+
+/* BUTTON */
+button{
+    width:100%;
+    margin-top:15px;
+    padding:12px;
+
+    background:#6d28d9;
+    color:white;
+
+    border:none;
+    border-radius:12px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+button:hover{
+    transform:scale(1.02);
+    background:#5b21b6;
+}

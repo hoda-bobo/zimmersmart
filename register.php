@@ -6,19 +6,24 @@ $message = "";
 
 if (isset($_POST['register'])) {
 
-    $name = trim($_POST['name']);
+    $first_name = trim($_POST['first_name']);
+    $last_name = trim($_POST['last_name']);
     $email = trim($_POST['email']);
     $password = $_POST['password'];
+    $phone = trim($_POST['phone']);
 
-    // כל מי שנרשם = לקוח
     $user_type = "customer";
 
-    $name = htmlspecialchars($name);
+    // ניקוי נכון
+    $first_name = htmlspecialchars($first_name);
+    $last_name = htmlspecialchars($last_name);
     $email = htmlspecialchars($email);
+    $phone = htmlspecialchars($phone);
 
-    if ($name == "" || $email == "" || $password == "") {
+    // בדיקת שדות (תוקן!)
+    if ($first_name == "" || $last_name == "" || $email == "" || $password == "") {
 
-        $message = "Fill all fields";
+        $message = "Fill all required fields";
 
     } else {
 
@@ -36,17 +41,36 @@ if (isset($_POST['register'])) {
             $hashed = password_hash($password, PASSWORD_DEFAULT);
 
             $stmt = $conn->prepare("
-                INSERT INTO users (name, email, password, user_type)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO users (first_name, last_name, email, password, user_type, phone)
+                VALUES (?, ?, ?, ?, ?, ?)
             ");
 
-            $stmt->bind_param("ssss", $name, $email, $hashed, $user_type);
+            $stmt->bind_param(
+                "ssssss",
+                $first_name,
+                $last_name,
+                $email,
+                $hashed,
+                $user_type,
+                $phone
+            );
 
-            if ($stmt->execute()) {
-                $message = "Registered successfully!";
-            } else {
-                $message = "Error registering";
-            }
+    if ($stmt->execute()) {
+    echo "
+    <div class='success-message'>
+        Registration successful! Redirecting to login...
+    </div>
+
+    <script>
+        setTimeout(function() {
+            window.location.href = 'login.php';
+        }, 2000);
+    </script>
+    ";
+    exit();
+} else {
+    $message = "Error registering";
+}
         }
     }
 }
@@ -75,11 +99,29 @@ if (isset($_POST['register'])) {
 
 <form method="POST" autocomplete="off">
 
-    <input type="text" name="name" placeholder="Full Name" required autocomplete="off">
+    <!-- טריק נגד autofill -->
+    <input type="text" name="fake_user" style="display:none">
+    <input type="password" name="fake_pass" style="display:none">
 
-    <input type="email" name="email" placeholder="Email" required autocomplete="off">
+    <input type="text" name="first_name" placeholder="First Name"
+           autocomplete="off" required>
 
-    <input type="password" name="password" placeholder="Password" required autocomplete="new-password">
+    <input type="text" name="last_name" placeholder="Last Name"
+           autocomplete="off" required>
+
+    <input type="email" name="email" placeholder="Email"
+           autocomplete="off" required>
+
+    <input type="text" name="phone" placeholder="Phone"
+           autocomplete="off">
+
+    <!-- סיסמה עם הגנה חזקה נגד שמירה/מילוי -->
+    <input type="password" name="password"
+           placeholder="Password"
+           autocomplete="new-password"
+           readonly
+           onfocus="this.removeAttribute('readonly');"
+           required>
 
     <button type="submit" name="register">Register</button>
 

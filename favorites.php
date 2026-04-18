@@ -1,9 +1,15 @@
 <?php
 session_start();
 include "connection.php";
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
 include "navbar.php";
 
-$user_id = $_SESSION['user_id'] ?? 0;
+$user_id = $_SESSION['user_id'];
 
 $result = $conn->query("SELECT * FROM favorites WHERE user_id='$user_id'");
 ?>

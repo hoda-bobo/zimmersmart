@@ -2,12 +2,12 @@
 session_start();
 include "connection.php";
 
+$message = "";
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
-
-$message = "";
 
 if (isset($_POST['add'])) {
 
@@ -18,33 +18,31 @@ if (isset($_POST['add'])) {
     $price = $_POST['price'];
     $guests = $_POST['guests'];
 
-    /* הוספת צימר */
     $stmt = $conn->prepare("
         INSERT INTO cabins (owner_id, name, description, location, price_per_night, max_guests)
         VALUES (?, ?, ?, ?, ?, ?)
     ");
+
     $stmt->bind_param("isssdi", $owner_id, $name, $description, $location, $price, $guests);
 
     if ($stmt->execute()) {
 
         $cabin_id = $stmt->insert_id;
 
-        /* העלאת תמונות */
-        $upload_folder = "uploads/";
-
-        if (!is_dir($upload_folder)) {
-            mkdir($upload_folder);
+        $folder = "uploads/";
+        if (!is_dir($folder)) {
+            mkdir($folder);
         }
 
         for ($i = 0; $i < count($_FILES['images']['name']); $i++) {
 
-            $file_name = $_FILES['images']['name'][$i];
+            $file = $_FILES['images']['name'][$i];
             $tmp = $_FILES['images']['tmp_name'][$i];
 
-            if ($file_name != "") {
+            if ($file != "") {
 
-                $new_name = time() . "_" . $i . "_" . $file_name;
-                $path = $upload_folder . $new_name;
+                $new_name = time() . "_" . $file;
+                $path = $folder . $new_name;
 
                 if (move_uploaded_file($tmp, $path)) {
 
@@ -65,40 +63,77 @@ if (isset($_POST['add'])) {
 }
 ?>
 
-<?php include "navbar.php"; ?>
-
 <!DOCTYPE html>
 <html>
 <head>
-<title>Add Cabin</title>
-<link rel="stylesheet" href="style.css">
+    <title>Add Cabin</title>
+
+    <!-- 🔥 חיבור CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="form-box">
+<?php include "navbar.php"; ?>
 
-<h2>Add Cabin</h2>
+<div class="add-wrapper">
 
-<p><?= $message ?></p>
+    <div class="cabin-card add-card">
 
-<form method="POST" enctype="multipart/form-data">
+        <div class="cabin-info">
 
-<input type="text" name="name" placeholder="Cabin Name" required>
+            <h2>Add New Cabin</h2>
+            <p>Create your vacation cabin</p>
 
-<textarea name="description" placeholder="Description"></textarea>
+            <?php if (!empty($message)) { ?>
+                <div class="success-msg"><?= $message ?></div>
+            <?php } ?>
 
-<input type="text" name="location" placeholder="Location" required>
+            <form method="POST" enctype="multipart/form-data" class="form-grid">
 
-<input type="number" name="price" placeholder="Price per night" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" name="name" required>
+                    </div>
 
-<input type="number" name="guests" placeholder="Max guests" required>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" name="location" required>
+                    </div>
+                </div>
 
-<input type="file" name="images[]" multiple>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description"></textarea>
+                </div>
 
-<button name="add">Add Cabin</button>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Price</label>
+                        <input type="number" name="price" required>
+                    </div>
 
-</form>
+                    <div class="form-group">
+                        <label>Guests</label>
+                        <input type="number" name="guests" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Images</label>
+                    <input type="file" name="images[]" multiple>
+                </div>
+
+                <button class="hero-btn add-btn" name="add">
+                    Add Cabin
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
 
 </div>
 

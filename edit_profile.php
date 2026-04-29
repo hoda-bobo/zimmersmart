@@ -1,6 +1,7 @@
 <?php
 session_start();
 include "connection.php";
+include "footer.php"; 
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -53,9 +54,9 @@ if (isset($_POST['update'])) {
 <div class="simple-form-box">
     <h2>Edit Profile</h2>
 
-    <?php if ($message != "") { ?>
-        <div class="message"><?= $message ?></div>
-    <?php } ?>
+   <div class="message <?= strpos($message, 'success') !== false ? 'success' : 'error' ?>">
+    <?= $message ?>
+</div>
 
     <form method="POST">
         <input type="text" name="first_name" value="<?= htmlspecialchars($user['first_name']) ?>" required>

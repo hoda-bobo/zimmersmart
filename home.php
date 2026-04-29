@@ -194,6 +194,6 @@ document.querySelectorAll('.slider').forEach(function(slider) {
     });
 });
 </script>
-
+<?php include "footer.php"; ?>
 </body>
 </html>

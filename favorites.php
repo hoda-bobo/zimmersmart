@@ -48,6 +48,6 @@ $result = $conn->query("SELECT * FROM favorites WHERE user_id='$user_id'");
     </div>
 
 </div>
-
+<?php include "footer.php"; ?>
 </body>
 </html>

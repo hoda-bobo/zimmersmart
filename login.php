@@ -2,6 +2,7 @@
 session_start();
 include "connection.php";
 
+
 $message = "";
 
 if (isset($_POST['login'])) {
@@ -67,6 +68,6 @@ if (isset($_POST['login'])) {
         </form>
     </div>
 </div>
-
+<?php include "footer.php"; ?>
 </body>
 </html>

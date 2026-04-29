@@ -2,6 +2,7 @@
 session_start();
 include "connection.php";
 
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
@@ -50,9 +51,9 @@ if (isset($_POST['change'])) {
 <div class="simple-form-box">
     <h2>Change Password</h2>
 
-    <?php if ($message != "") { ?>
-        <div class="message"><?= $message ?></div>
-    <?php } ?>
+   <div class="message <?= strpos($message, 'successfully') !== false ? 'success' : 'error' ?>">
+    <?= $message ?>
+</div>
 
     <form method="POST">
         <input type="password" name="current_password" placeholder="Current Password" required>
@@ -60,6 +61,6 @@ if (isset($_POST['change'])) {
         <button type="submit" name="change" class="btn">Update Password</button>
     </form>
 </div>
-
+<?php include "footer.php"; ?>
 </body>
 </html>

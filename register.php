@@ -14,13 +14,11 @@ if (isset($_POST['register'])) {
 
     $user_type = "customer";
 
-    // ניקוי נכון
     $first_name = htmlspecialchars($first_name);
     $last_name = htmlspecialchars($last_name);
     $email = htmlspecialchars($email);
     $phone = htmlspecialchars($phone);
 
-    // בדיקת שדות (תוקן!)
     if ($first_name == "" || $last_name == "" || $email == "" || $password == "") {
 
         $message = "Fill all required fields";
@@ -45,8 +43,7 @@ if (isset($_POST['register'])) {
                 VALUES (?, ?, ?, ?, ?, ?)
             ");
 
-            $stmt->bind_param(
-                "ssssss",
+            $stmt->bind_param("ssssss",
                 $first_name,
                 $last_name,
                 $email,
@@ -55,22 +52,22 @@ if (isset($_POST['register'])) {
                 $phone
             );
 
-    if ($stmt->execute()) {
-    echo "
-    <div class='success-message'>
-        Registration successful! Redirecting to login...
-    </div>
+            if ($stmt->execute()) {
+                echo "
+                <div class='success-message'>
+                    Registration successful! Redirecting to login...
+                </div>
 
-    <script>
-        setTimeout(function() {
-            window.location.href = 'login.php';
-        }, 2000);
-    </script>
-    ";
-    exit();
-} else {
-    $message = "Error registering";
-}
+                <script>
+                    setTimeout(function() {
+                        window.location.href = 'login.php';
+                    }, 2000);
+                </script>
+                ";
+                exit();
+            } else {
+                $message = "Error registering";
+            }
         }
     }
 }
@@ -87,7 +84,7 @@ if (isset($_POST['register'])) {
 <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="register-page">
 
 <div class="container">
 
@@ -103,19 +100,14 @@ if (isset($_POST['register'])) {
     <input type="text" name="fake_user" style="display:none">
     <input type="password" name="fake_pass" style="display:none">
 
-    <input type="text" name="first_name" placeholder="First Name"
-           autocomplete="off" required>
+    <input type="text" name="first_name" placeholder="First Name" required>
 
-    <input type="text" name="last_name" placeholder="Last Name"
-           autocomplete="off" required>
+    <input type="text" name="last_name" placeholder="Last Name" required>
 
-    <input type="email" name="email" placeholder="Email"
-           autocomplete="off" required>
+    <input type="email" name="email" placeholder="Email" required>
 
-    <input type="text" name="phone" placeholder="Phone"
-           autocomplete="off">
+    <input type="text" name="phone" placeholder="Phone">
 
-    <!-- סיסמה עם הגנה חזקה נגד שמירה/מילוי -->
     <input type="password" name="password"
            placeholder="Password"
            autocomplete="new-password"
@@ -124,6 +116,10 @@ if (isset($_POST['register'])) {
            required>
 
     <button type="submit" name="register">Register</button>
+
+    <div class="login-link">
+        Already have an account? <a href="login.php">Login</a>
+    </div>
 
 </form>
 

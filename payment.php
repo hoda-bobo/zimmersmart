@@ -50,6 +50,9 @@ if (!empty($services_array)) {
     }
 }
 
+/* חישוב מחיר כולל */
+$final_price = $total_price + $services_total;
+
 /* הודעה */
 $message = "";
 
@@ -61,7 +64,7 @@ if (isset($_POST['pay'])) {
         VALUES (?, ?, ?, ?, ?, 'confirmed')
     ");
 
-    $insert->bind_param("iissd", $cabin_id, $user_id, $start_date, $end_date, $total_price);
+    $insert->bind_param("iissd", $cabin_id, $user_id, $start_date, $end_date, $final_price);
 
     if ($insert->execute()) {
         header("Location: bookingconfirmation.php");
@@ -78,46 +81,53 @@ if (isset($_POST['pay'])) {
     <title>Payment</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <div class="payment-box">
 
-<h2>Payment</h2>
+    <h2>Payment</h2>
 
-<p><b>From:</b> <?= htmlspecialchars($start_date) ?></p>
-<p><b>To:</b> <?= htmlspecialchars($end_date) ?></p>
+    <p><b>From:</b> <?= htmlspecialchars($start_date) ?></p>
+    <p><b>To:</b> <?= htmlspecialchars($end_date) ?></p>
 
-<!-- שירותים -->
-<?php if (!empty($services_names)) { ?>
-    <h3>Selected Services</h3>
-    <?php foreach ($services_names as $name) { ?>
-        <p>✔ <?= htmlspecialchars($name) ?></p>
+    <!-- שירותים -->
+    <?php if (!empty($services_names)) { ?>
+        <h3>Selected Services</h3>
+        <?php foreach ($services_names as $name) { ?>
+            <p>✔ <?= htmlspecialchars($name) ?></p>
+        <?php } ?>
     <?php } ?>
-<?php } ?>
 
-<!-- מחיר -->
-<h3>Total Price: $<?= htmlspecialchars($total_price) ?></h3>
+    <!-- מחיר -->
+    <h3>Total Price: $<?= htmlspecialchars($final_price) ?></h3>
 
-<?php if ($message != "") { ?>
-    <div class="message"><?= $message ?></div>
-<?php } ?>
+    <?php if ($message != "") { ?>
+        <div class="message"><?= $message ?></div>
+    <?php } ?>
 
-<form method="POST">
+    <form method="POST">
 
-    <label>Card Number</label>
-    <input type="text" required>
+        <label>Card Number</label>
+        <input type="text" name="card" placeholder="1234 5678 9012 3456" required>
 
-    <label>Expiry</label>
-    <input type="text" required>
+        <label>Expiry</label>
+        <input type="text" name="expiry" placeholder="MM/YY" required>
 
-    <label>CVV</label>
-    <input type="text" required>
+        <label>CVV</label>
+        <input type="text" name="cvv" placeholder="123" required>
 
-    <button type="submit" name="pay">Pay Now</button>
+        <div class="secure">
+            🔒 Secure Payment
+        </div>
 
-</form>
+        <button type="submit" name="pay">Pay Now</button>
+
+    </form>
 
 </div>
+
+<?php include "footer.php"; ?>
 
 </body>
 </html>

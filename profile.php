@@ -2,6 +2,7 @@
 session_start();
 include "connection.php";
 
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
@@ -54,119 +55,86 @@ $fav_result = $fav->get_result();
 </head>
 <body>
 
-<div class="profile-page-fixed">
+<div class="profile-container">
 
-    <div class="profile-hero-fixed">
-        <div class="profile-hero-overlay-fixed">
-            <p class="profile-small-title-fixed">My Account</p>
-            <h1>Welcome, <?= htmlspecialchars($user['first_name'] . " " . $user['last_name']) ?> ✨</h1>
-            <p class="profile-subtitle-fixed">
-                Manage your personal details, bookings and favorite cabins
-            </p>
+    <!-- HEADER -->
+    <div class="profile-header">
+        <div class="avatar">
+            <?= strtoupper(substr($user['first_name'],0,1)) ?>
+        </div>
+
+        <div>
+            <h2><?= htmlspecialchars($user['first_name']." ".$user['last_name']) ?></h2>
+            <p><?= htmlspecialchars($user['email']) ?></p>
+        </div>
+
+        <div class="profile-actions">
+            <a href="edit_profile.php">Edit</a>
+            <a href="change_password.php">Password</a>
         </div>
     </div>
 
-    <div class="profile-content-fixed">
+    <!-- STATS -->
+    <div class="profile-stats">
+        <div><?= $bookings_result->num_rows ?> bookings</div>
+        <div><?= $fav_result->num_rows ?> favorites</div>
+        <div><?= htmlspecialchars($user['user_type']) ?></div>
+    </div>
 
-        <div class="profile-main-fixed">
-            <div class="profile-user-box-fixed">
-                <div class="profile-avatar-fixed">
-                    <?= strtoupper(substr($user['first_name'], 0, 1)) ?>
+    <!-- BOOKINGS -->
+    <div class="profile-section">
+        <h3>My Bookings</h3>
+
+        <?php if ($bookings_result->num_rows > 0) { ?>
+            <?php while($b = $bookings_result->fetch_assoc()) { ?>
+
+            <div class="profile-row">
+
+                <div>
+                    <b><?= htmlspecialchars($b['cabin_name']) ?></b>
+                    <p><?= $b['start_date'] ?> → <?= $b['end_date'] ?></p>
                 </div>
 
-                <div class="profile-user-info-fixed">
-                    <h2><?= htmlspecialchars($user['first_name'] . " " . $user['last_name']) ?></h2>
-                    <p><b>Email:</b> <?= htmlspecialchars($user['email']) ?></p>
-                    <p><b>Phone:</b> <?= htmlspecialchars($user['phone']) ?></p>
-                    <span class="profile-role-fixed"><?= htmlspecialchars($user['user_type']) ?></span>
+                <div class="right">
+                    <span class="status"><?= $b['status'] ?></span>
+                    <div class="price">₪<?= $b['total_price'] ?></div>
                 </div>
+
             </div>
 
-            <div class="profile-actions-fixed">
-                <a href="edit_profile.php" class="profile-btn-fixed">Edit Profile</a>
-                <a href="change_password.php" class="profile-btn-fixed profile-btn-light-fixed">Change Password</a>
-            </div>
-        </div>
+            <?php } ?>
+        <?php } else { ?>
+            <p>No bookings yet</p>
+        <?php } ?>
+    </div>
 
-        <div class="profile-stats-fixed">
-            <div class="profile-stat-card-fixed">
-                <h3><?= $bookings_result->num_rows ?></h3>
-                <p>Bookings</p>
-            </div>
+    <!-- FAVORITES -->
+    <div class="profile-section">
+        <h3>My Favorites</h3>
 
-            <div class="profile-stat-card-fixed">
-                <h3><?= $fav_result->num_rows ?></h3>
-                <p>Favorites</p>
-            </div>
+        <?php if ($fav_result->num_rows > 0) { ?>
+            <?php while($f = $fav_result->fetch_assoc()) { ?>
 
-            <div class="profile-stat-card-fixed">
-                <h3><?= htmlspecialchars($user['user_type']) ?></h3>
-                <p>Role</p>
-            </div>
-        </div>
+            <div class="profile-row">
 
-        <div class="profile-sections-fixed">
+                <div>
+                    <b><?= htmlspecialchars($f['name']) ?></b>
+                    <p><?= htmlspecialchars($f['location']) ?></p>
+                </div>
 
-            <div class="profile-box-fixed">
-                <h3>My Bookings</h3>
+                <div class="right">
+                    ❤
+                </div>
 
-                <?php
-                $bookings->execute();
-                $bookings_result = $bookings->get_result();
-                ?>
-
-                <?php if ($bookings_result->num_rows > 0) { ?>
-                    <?php while($b = $bookings_result->fetch_assoc()) { ?>
-                        <div class="profile-item-fixed">
-                            <div>
-                                <h4><?= htmlspecialchars($b['cabin_name']) ?></h4>
-                                <p><?= htmlspecialchars($b['start_date']) ?> → <?= htmlspecialchars($b['end_date']) ?></p>
-                            </div>
-
-                            <div class="profile-item-right-fixed">
-                                <span class="profile-status-fixed <?= htmlspecialchars($b['status']) ?>">
-                                    <?= htmlspecialchars($b['status']) ?>
-                                </span>
-                                <p class="profile-price-fixed">$<?= htmlspecialchars($b['total_price']) ?></p>
-                            </div>
-                        </div>
-                    <?php } ?>
-                <?php } else { ?>
-                    <p class="profile-empty-fixed">No bookings yet</p>
-                <?php } ?>
             </div>
 
-            <div class="profile-box-fixed">
-                <h3>My Favorites</h3>
-
-                <?php
-                $fav->execute();
-                $fav_result = $fav->get_result();
-                ?>
-
-                <?php if ($fav_result->num_rows > 0) { ?>
-                    <?php while($f = $fav_result->fetch_assoc()) { ?>
-                        <div class="profile-item-fixed">
-                            <div>
-                                <h4><?= htmlspecialchars($f['name']) ?></h4>
-                                <p><?= htmlspecialchars($f['location']) ?></p>
-                            </div>
-
-                            <div class="profile-item-right-fixed">
-                                <span class="profile-favorite-fixed">❤ Favorite</span>
-                            </div>
-                        </div>
-                    <?php } ?>
-                <?php } else { ?>
-                    <p class="profile-empty-fixed">No favorites yet</p>
-                <?php } ?>
-            </div>
-
-        </div>
-
+            <?php } ?>
+        <?php } else { ?>
+            <p>No favorites yet</p>
+        <?php } ?>
     </div>
 
 </div>
-
+<?php include "footer.php"; ?>
 </body>
 </html>

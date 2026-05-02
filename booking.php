@@ -151,11 +151,19 @@ include "navbar.php";
 
             <div class="services-box">
 
-            <?php while($s = $services_result->fetch_assoc()) { ?>
+            <?php while($s = $services_result->fetch_assoc()) { 
 
-                <label class="service-wrapper">
+                $isPaid = $s['price'] > 0;
+            ?>
 
-                    <input type="checkbox" name="services[]" value="<?= $s['service_id'] ?>">
+                <label class="service-wrapper <?= !$isPaid ? 'disabled-service' : '' ?>">
+
+                    <input 
+                        type="checkbox" 
+                        name="services[]" 
+                        value="<?= $s['service_id'] ?>"
+                        <?= !$isPaid ? 'disabled' : '' ?>
+                    >
 
                     <div class="service-card">
 
@@ -167,10 +175,10 @@ include "navbar.php";
                         </div>
 
                         <div class="service-price">
-                            <?php if ($s['price'] > 0) { ?>
+                            <?php if ($isPaid) { ?>
                                 +$<?= $s['price'] ?>
                             <?php } else { ?>
-                                Free
+                                Included
                             <?php } ?>
                         </div>
 

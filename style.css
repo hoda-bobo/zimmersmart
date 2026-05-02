@@ -2642,3 +2642,524 @@ body {
     font-weight: bold;
     text-align: center;
 }
+
+/* ================================
+   EDIT CABIN PAGE
+================================ */
+
+.edit-page {
+    min-height: 100vh;
+    padding: 40px 0;
+    background:
+        radial-gradient(circle at top left, rgba(168, 85, 247, 0.18), transparent 35%),
+        radial-gradient(circle at top right, rgba(236, 72, 153, 0.14), transparent 30%),
+        linear-gradient(135deg, #f9fafb 0%, #f3f4ff 50%, #faf5ff 100%);
+}
+
+.edit-container {
+    width: 92%;
+    max-width: 850px;
+    margin: auto;
+}
+
+/* HEADER */
+.edit-header {
+    margin-bottom: 25px;
+}
+
+.edit-header h1 {
+    font-size: 34px;
+    color: #1f2937;
+}
+
+.edit-header p {
+    color: #6b7280;
+}
+
+/* CARD */
+.edit-card {
+    background: rgba(255,255,255,0.95);
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    border: 1px solid #eee;
+}
+
+/* TITLE */
+.edit-card h3 {
+    margin-top: 25px;
+    color: #1f2937;
+}
+
+/* INPUTS */
+.edit-card input {
+    width: 100%;
+    padding: 13px;
+    margin-top: 10px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.edit-card input:focus {
+    border-color: #a855f7;
+    box-shadow: 0 0 0 2px rgba(168,85,247,0.2);
+    outline: none;
+}
+
+/* ROW */
+.row {
+    display: flex;
+    gap: 12px;
+}
+
+/* SERVICES */
+.services {
+    margin-top: 10px;
+}
+
+.services label {
+    background: #f3f4f6;
+    padding: 8px 12px;
+    border-radius: 12px;
+    margin: 6px;
+    display: inline-block;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.services label:hover {
+    background: #e9d5ff;
+}
+
+/* BUTTON */
+.edit-card button {
+    width: 100%;
+    margin-top: 25px;
+    padding: 14px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #a855f7, #ec4899);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.edit-card button:hover {
+    transform: translateY(-2px);
+}
+
+/* SUCCESS */
+.success {
+    background: #dcfce7;
+    color: #15803d;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* TABS */
+.stats-tabs {
+    display: flex;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.stats-tabs a {
+    padding: 10px 18px;
+    border-radius: 12px;
+    background: #f3f4f6;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.stats-tabs a:hover {
+    background: #e5e7eb;
+}
+
+.stats-tabs a.active {
+    background: linear-gradient(135deg, #a855f7, #ec4899);
+    color: white;
+}
+
+/* GRID */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* CARD */
+.chart-card {
+    background: rgba(255,255,255,0.95);
+    padding: 22px;
+    border-radius: 20px;
+    margin-top: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+
+.chart-card:hover {
+    transform: translateY(-4px);
+}
+
+/* TABLE */
+.stats-table {
+    width: 100%;
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.stats-table th {
+    background: #f3f4f6;
+    padding: 12px;
+    font-weight: bold;
+}
+
+.stats-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.stats-table tr:hover {
+    background: #fafafa;
+}
+
+.disabled-service {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.disabled-service .service-card {
+    background: #f3f4f6;
+}
+
+.services-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.service-chip {
+    background: #f3f4f6;
+    padding: 6px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.service-chip input {
+    display: none;
+}
+
+.service-chip:has(input:checked) {
+    background: linear-gradient(135deg, #a855f7, #ec4899);
+    color: white;
+}
+
+
+.search-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+.filters-sidebar {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.filters-sidebar select {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.services-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.chip {
+    background: #f3f4f6;
+    padding: 6px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.chip input {
+    display: none;
+}
+
+.chip:has(input:checked) {
+    background: linear-gradient(135deg,#a855f7,#ec4899);
+    color: white;
+}
+
+
+
+.card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.card-bottom {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.btn {
+    background: linear-gradient(135deg,#a855f7,#ec4899);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 10px;
+}
+
+/* FIX OVERFLOW */
+body {
+    overflow-x: hidden;
+}
+
+/* CONTAINER */
+.page-container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+
+
+/* SIDEBAR */
+.filters-sidebar {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    height: fit-content;
+}
+
+.filters-sidebar select {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/* SERVICES */
+.services-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.chip {
+    background: #f3f4f6;
+    padding: 6px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.chip input {
+    display: none;
+}
+
+.chip:has(input:checked) {
+    background: linear-gradient(135deg,#a855f7,#ec4899);
+    color: white;
+}
+
+/* CARDS */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+/* CARD */
+.card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.card-bottom {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.btn {
+    background: linear-gradient(135deg,#a855f7,#ec4899);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 10px;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+.page-container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+.search-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+.filters-sidebar {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.services-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.chip {
+    background: #f3f4f6;
+    padding: 6px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.chip input {
+    display: none;
+}
+
+.chip:has(input:checked) {
+    background: linear-gradient(135deg,#a855f7,#ec4899);
+    color: white;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.card-bottom {
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn {
+    background: linear-gradient(135deg,#a855f7,#ec4899);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 10px;
+}
+
+/* ===== SEARCH FIX ===== */
+
+.search-layout {
+    display: block;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+    width: 100%;
+}
+
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* תמונה */
+.card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+/* תוכן */
+.card-body {
+    padding: 15px;
+    flex: 1;
+}
+
+/* תחתית */
+.card-bottom {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* כפתור */
+.btn {
+    padding: 8px 14px;
+    border-radius: 10px;
+}

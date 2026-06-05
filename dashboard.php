@@ -38,7 +38,7 @@ $monthly_revenue = runQuery($conn, "
     WHERE c.owner_id = $owner_id
 ")->fetch_assoc()['total'];
 
-/* גרף חודשי */
+/* Monthly chart */
 $monthly_stats = runQuery($conn, "
     SELECT MONTH(start_date) m, COUNT(*) bookings, SUM(total_price) revenue
     FROM bookings b
@@ -64,9 +64,10 @@ $monthly_stats = runQuery($conn, "
 
 <h1>Dashboard</h1>
 
-<div style="display:flex; gap:10px;">
+<div style="display:flex; gap:10px; flex-wrap:wrap;">
     <a href="add_cabins.php" class="owner-main-btn">Add Cabin</a>
     <a href="statistics.php" class="owner-main-btn">Statistics</a>
+    <a href="pricingavailability.php" class="owner-main-btn">Manage Availability</a>
 </div>
 
 <div class="stats-grid">
@@ -119,6 +120,8 @@ new Chart(document.getElementById('chart'), {
     }
 });
 </script>
+
+</div>
 
 </body>
 </html>

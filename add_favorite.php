@@ -1,6 +1,7 @@
 <?php
 session_start();
 include "connection.php";
+include "lead_helper.php";
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");

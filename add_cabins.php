@@ -1,75 +1,130 @@
 <?php
 session_start();
+
 include "connection.php";
+include "language.php";
+include "lead_helper.php";
 
 $message = "";
+$message_type = "";
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
+if (($_SESSION['user_type'] ?? '') !== 'owner') {
+    die(t('access_denied'));
+}
+
 if (isset($_POST['add'])) {
 
-    $owner_id = $_SESSION['user_id'];
-    $name = $_POST['name'];
-    $description = $_POST['description'];
-    $location = $_POST['location'];
-    $price = $_POST['price'];
-    $guests = $_POST['guests'];
+    $owner_id = (int)$_SESSION['user_id'];
+    $name = trim($_POST['name'] ?? '');
+    $description = trim($_POST['description'] ?? '');
+    $location = trim($_POST['location'] ?? '');
+    $price = (float)($_POST['price'] ?? 0);
+    $guests = (int)($_POST['guests'] ?? 0);
 
-    $stmt = $conn->prepare("
-        INSERT INTO cabins (owner_id, name, description, location, price_per_night, max_guests)
-        VALUES (?, ?, ?, ?, ?, ?)
-    ");
+    if ($name === '' || $location === '' || $price <= 0 || $guests <= 0) {
+        $message = t('please_fill_required_fields');
+        $message_type = "error";
+    } else {
 
-    $stmt->bind_param("isssdi", $owner_id, $name, $description, $location, $price, $guests);
+        $stmt = $conn->prepare("
+            INSERT INTO cabins
+                (owner_id, name, description, location, price_per_night, max_guests)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
 
-    if ($stmt->execute()) {
+        $stmt->bind_param(
+            "isssdi",
+            $owner_id,
+            $name,
+            $description,
+            $location,
+            $price,
+            $guests
+        );
 
-        $cabin_id = $stmt->insert_id;
+        if ($stmt->execute()) {
 
-        $folder = "uploads/";
-        if (!is_dir($folder)) {
-            mkdir($folder);
-        }
+            $cabin_id = $stmt->insert_id;
 
-        for ($i = 0; $i < count($_FILES['images']['name']); $i++) {
+            $folder = "uploads/";
 
-            $file = $_FILES['images']['name'][$i];
-            $tmp = $_FILES['images']['tmp_name'][$i];
+            if (!is_dir($folder)) {
+                mkdir($folder, 0777, true);
+            }
 
-            if ($file != "") {
+            if (
+                isset($_FILES['images']) &&
+                is_array($_FILES['images']['name'])
+            ) {
+                $allowed_extensions = ['jpg', 'jpeg', 'png', 'webp'];
 
-                $new_name = time() . "_" . $file;
-                $path = $folder . $new_name;
+                for ($i = 0; $i < count($_FILES['images']['name']); $i++) {
 
-                if (move_uploaded_file($tmp, $path)) {
+                    $original_name = $_FILES['images']['name'][$i] ?? '';
+                    $tmp_name = $_FILES['images']['tmp_name'][$i] ?? '';
+                    $upload_error = $_FILES['images']['error'][$i] ?? UPLOAD_ERR_NO_FILE;
 
-                    $img = $conn->prepare("
-                        INSERT INTO cabin_images (cabin_id, image_path)
-                        VALUES (?, ?)
-                    ");
-                    $img->bind_param("is", $cabin_id, $path);
-                    $img->execute();
+                    if (
+                        $original_name === '' ||
+                        $upload_error !== UPLOAD_ERR_OK ||
+                        !is_uploaded_file($tmp_name)
+                    ) {
+                        continue;
+                    }
+
+                    $extension = strtolower(pathinfo($original_name, PATHINFO_EXTENSION));
+
+                    if (!in_array($extension, $allowed_extensions, true)) {
+                        continue;
+                    }
+
+                    $new_name = uniqid('cabin_', true) . '.' . $extension;
+                    $path = $folder . $new_name;
+
+                    if (move_uploaded_file($tmp_name, $path)) {
+
+                        $img = $conn->prepare("
+                            INSERT INTO cabin_images (cabin_id, image_path)
+                            VALUES (?, ?)
+                        ");
+
+                        $img->bind_param("is", $cabin_id, $path);
+                        $img->execute();
+                        $img->close();
+                    }
                 }
             }
+
+            $message = t('cabin_added_successfully');
+            $message_type = "success";
+
+            $_POST = [];
+
+        } else {
+            $message = t('cabin_add_error');
+            $message_type = "error";
         }
 
-        $message = "Cabin added successfully!";
-    } else {
-        $message = "Error!";
+        $stmt->close();
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="<?= ($_SESSION['lang'] ?? 'en') === 'he' ? 'he' : 'en' ?>"
+      dir="<?= ($_SESSION['lang'] ?? 'en') === 'he' ? 'rtl' : 'ltr' ?>">
 <head>
-    <title>Add Cabin</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- 🔥 חיבור CSS -->
-    <link rel="stylesheet" href="style.css">
+    <title><?= t('add_cabin') ?></title>
+
+    <link rel="stylesheet" href="style.css?v=<?= time() ?>">
 </head>
 
 <body>
@@ -82,51 +137,134 @@ if (isset($_POST['add'])) {
 
         <div class="cabin-info">
 
-            <h2>Add New Cabin</h2>
-            <p>Create your vacation cabin</p>
+            <h2><?= t('add_new_cabin') ?></h2>
 
-            <?php if (!empty($message)) { ?>
-                <div class="success-msg"><?= $message ?></div>
+            <p><?= t('create_your_vacation_cabin') ?></p>
+
+            <?php if ($message !== "") { ?>
+
+                <div class="<?= $message_type === 'success' ? 'success-msg' : 'error-msg' ?>">
+                    <?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?>
+                </div>
+
             <?php } ?>
 
             <form method="POST" enctype="multipart/form-data" class="form-grid">
 
                 <div class="form-row">
+
                     <div class="form-group">
-                        <label>Name</label>
-                        <input type="text" name="name" required>
+
+                        <label for="name">
+                            <?= t('cabin_name') ?>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            required
+                            value="<?= htmlspecialchars($_POST['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                        >
+
                     </div>
 
                     <div class="form-group">
-                        <label>Location</label>
-                        <input type="text" name="location" required>
+
+                        <label for="location">
+                            <?= t('location') ?>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="location"
+                            name="location"
+                            required
+                            value="<?= htmlspecialchars($_POST['location'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                        >
+
                     </div>
+
                 </div>
 
                 <div class="form-group">
-                    <label>Description</label>
-                    <textarea name="description"></textarea>
+
+                    <label for="description">
+                        <?= t('description') ?>
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                    ><?= htmlspecialchars($_POST['description'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+
                 </div>
 
                 <div class="form-row">
+
                     <div class="form-group">
-                        <label>Price</label>
-                        <input type="number" name="price" required>
+
+                        <label for="price">
+                            <?= t('price_per_night') ?>
+                        </label>
+
+                        <input
+                            type="number"
+                            id="price"
+                            name="price"
+                            min="1"
+                            step="0.01"
+                            required
+                            value="<?= htmlspecialchars($_POST['price'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                        >
+
                     </div>
 
                     <div class="form-group">
-                        <label>Guests</label>
-                        <input type="number" name="guests" required>
+
+                        <label for="guests">
+                            <?= t('max_guests') ?>
+                        </label>
+
+                        <input
+                            type="number"
+                            id="guests"
+                            name="guests"
+                            min="1"
+                            required
+                            value="<?= htmlspecialchars($_POST['guests'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                        >
+
                     </div>
+
                 </div>
 
                 <div class="form-group">
-                    <label>Images</label>
-                    <input type="file" name="images[]" multiple>
+
+                    <label for="images">
+                        <?= t('cabin_images') ?>
+                    </label>
+
+                    <input
+                        type="file"
+                        id="images"
+                        name="images[]"
+                        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                        multiple
+                    >
+
+                    <small>
+                        <?= t('allowed_image_types') ?>
+                    </small>
+
                 </div>
 
-                <button class="hero-btn add-btn" name="add">
-                    Add Cabin
+                <button
+                    type="submit"
+                    class="hero-btn add-btn"
+                    name="add"
+                >
+                    <?= t('add_cabin') ?>
                 </button>
 
             </form>
@@ -136,6 +274,8 @@ if (isset($_POST['add'])) {
     </div>
 
 </div>
+
+<?php include "footer.php"; ?>
 
 </body>
 </html>

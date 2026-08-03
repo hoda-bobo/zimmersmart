@@ -1,129 +1,235 @@
 <?php
-include "header.php";
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 include "connection.php";
+include "language.php";
 
 $message = "";
 
 if (isset($_POST['register'])) {
 
-    $first_name = trim($_POST['first_name']);
-    $last_name = trim($_POST['last_name']);
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
-    $phone = trim($_POST['phone']);
+    $first_name = trim($_POST['first_name'] ?? "");
+    $last_name  = trim($_POST['last_name'] ?? "");
+    $email      = trim($_POST['email'] ?? "");
+    $password   = $_POST['password'] ?? "";
+    $phone      = trim($_POST['phone'] ?? "");
 
     $user_type = "customer";
 
-    $first_name = htmlspecialchars($first_name);
-    $last_name = htmlspecialchars($last_name);
-    $email = htmlspecialchars($email);
-    $phone = htmlspecialchars($phone);
+    if (
+        $first_name === "" ||
+        $last_name === "" ||
+        $email === "" ||
+        $password === ""
+    ) {
 
-    if ($first_name == "" || $last_name == "" || $email == "" || $password == "") {
+        $message = t('fill_required_fields');
 
-        $message = "Fill all required fields";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+
+        $message = t('invalid_email');
+
+    } elseif (strlen($password) < 6) {
+
+        $message = t('password_min_length');
 
     } else {
 
-        $check = $conn->prepare("SELECT id FROM users WHERE email=?");
+        $check = $conn->prepare("
+            SELECT id
+            FROM users
+            WHERE email = ?
+            LIMIT 1
+        ");
+
+        if (!$check) {
+            die("SQL ERROR: " . $conn->error);
+        }
+
         $check->bind_param("s", $email);
         $check->execute();
         $check->store_result();
 
         if ($check->num_rows > 0) {
 
-            $message = "Email already exists";
+            $message = t('email_exists');
 
         } else {
 
-            $hashed = password_hash($password, PASSWORD_DEFAULT);
+            $hashed_password = password_hash(
+                $password,
+                PASSWORD_DEFAULT
+            );
 
             $stmt = $conn->prepare("
-                INSERT INTO users (first_name, last_name, email, password, user_type, phone)
+                INSERT INTO users
+                (
+                    first_name,
+                    last_name,
+                    email,
+                    password,
+                    user_type,
+                    phone
+                )
                 VALUES (?, ?, ?, ?, ?, ?)
             ");
 
-            $stmt->bind_param("ssssss",
+            if (!$stmt) {
+                die("SQL ERROR: " . $conn->error);
+            }
+
+            $stmt->bind_param(
+                "ssssss",
                 $first_name,
                 $last_name,
                 $email,
-                $hashed,
+                $hashed_password,
                 $user_type,
                 $phone
             );
 
             if ($stmt->execute()) {
-                echo "
-                <div class='success-message'>
-                    Registration successful! Redirecting to login...
-                </div>
 
-                <script>
-                    setTimeout(function() {
-                        window.location.href = 'login.php';
-                    }, 2000);
-                </script>
-                ";
+                $stmt->close();
+                $check->close();
+
+                header("Location: login.php?registered=1");
                 exit();
+
             } else {
-                $message = "Error registering";
+
+                $message = t('registration_error');
             }
+
+            $stmt->close();
         }
+
+        $check->close();
     }
 }
+
 ?>
 
-<?php include "navbar.php"; ?>
-
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Register</title>
+<html
+    lang="<?= htmlspecialchars($_SESSION['lang'] ?? 'en') ?>"
+    dir="<?= ($_SESSION['lang'] ?? 'en') === 'he' ? 'rtl' : 'ltr' ?>"
+>
 
-<link rel="stylesheet" href="style.css">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title><?= t('register') ?></title>
+
+    <link
+        rel="stylesheet"
+        href="style.css?v=<?= time(); ?>"
+    >
+
 </head>
 
 <body class="register-page">
 
+<?php include "navbar.php"; ?>
+
 <div class="container">
 
-<div class="card">
+    <div class="card">
 
-<h2>Register</h2>
+        <h2><?= t('register') ?></h2>
 
-<div class="msg"><?= $message ?></div>
+        <?php if ($message !== ""): ?>
 
-<form method="POST" autocomplete="off">
+            <div class="msg">
+                <?= htmlspecialchars($message) ?>
+            </div>
 
-    <!-- טריק נגד autofill -->
-    <input type="text" name="fake_user" style="display:none">
-    <input type="password" name="fake_pass" style="display:none">
+        <?php endif; ?>
 
-    <input type="text" name="first_name" placeholder="First Name" required>
+        <form method="POST" autocomplete="off">
 
-    <input type="text" name="last_name" placeholder="Last Name" required>
+            <input
+                type="text"
+                name="fake_user"
+                style="display:none"
+            >
 
-    <input type="email" name="email" placeholder="Email" required>
+            <input
+                type="password"
+                name="fake_pass"
+                style="display:none"
+            >
 
-    <input type="text" name="phone" placeholder="Phone">
+            <input
+                type="text"
+                name="first_name"
+                placeholder="<?= t('first_name') ?>"
+                value="<?= htmlspecialchars($_POST['first_name'] ?? '') ?>"
+                required
+            >
 
-    <input type="password" name="password"
-           placeholder="Password"
-           autocomplete="new-password"
-           readonly
-           onfocus="this.removeAttribute('readonly');"
-           required>
+            <input
+                type="text"
+                name="last_name"
+                placeholder="<?= t('last_name') ?>"
+                value="<?= htmlspecialchars($_POST['last_name'] ?? '') ?>"
+                required
+            >
 
-    <button type="submit" name="register">Register</button>
+            <input
+                type="email"
+                name="email"
+                placeholder="<?= t('email') ?>"
+                value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
+                required
+            >
 
-    <div class="login-link">
-        Already have an account? <a href="login.php">Login</a>
+            <input
+                type="text"
+                name="phone"
+                placeholder="<?= t('phone') ?>"
+                value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>"
+            >
+
+            <input
+                type="password"
+                name="password"
+                placeholder="<?= t('password') ?>"
+                autocomplete="new-password"
+                readonly
+                onfocus="this.removeAttribute('readonly');"
+                required
+            >
+
+            <button
+                type="submit"
+                name="register"
+            >
+                <?= t('register') ?>
+            </button>
+
+            <div class="login-link">
+
+                <?= t('already_have_account') ?>
+
+                <a href="login.php">
+                    <?= t('login') ?>
+                </a>
+
+            </div>
+
+        </form>
+
     </div>
-
-</form>
-
-</div>
 
 </div>
 
